@@ -1,212 +1,220 @@
 # bacteremia-prediction-sr
 Python and R code for a systematic review of bacteremia prediction models.
 
+This repository contains all code used in our systematic review of bacteremia prediction models:
+- **01_ml_filter/**: Machine learning–assisted screening filter (Python; TF-IDF + LightGBM, Optuna)
+- **02_ai_assist/**: AI-assisted full-text screening and data extraction (Python)
+- **03_meta_analysis/**: Meta-analysis of model performance (R; `metamisc`, `metafor`, `meta`, etc.)
+
 ## Repository Structure
 
-### Meta-Analysis Code (bacteremia_sr_meta_analysis.r)
-
-**Purpose**: Statistical meta-analysis of prediction model performance
-
-**Key Features**:
-- Data preprocessing and cleaning for systematic review datasets
-- C-statistics meta-analysis using metamisc and valmeta
-- O:E ratio (observed-to-expected events) meta-analysis
-- Forest plot generation for discriminative and calibration performance
-- PROBAST (Prediction model Risk Of Bias ASsessment Tool) risk assessment visualization
-- Comprehensive summary statistics and model comparison tables
-
-**Main Outputs**:
-- Forest plots for C-statistics and O:E ratios by prediction model
-- PROBAST risk of bias and applicability assessment charts
-- Summary tables with pooled estimates and confidence intervals
-
-### AI-Assisted Screening (bacteremia_prediction_sr_preprocess_for_screening_with_ai.ipynb)
-
-**Purpose**: Full-text screening using large language models
-
-**Key Features**:
-- PDF text extraction using Adobe PDF Services API
-- Full-text preprocessing and segmentation
-- Claude 3.7 Sonnet integration for automated screening decisions
-- Structured output parsing with inclusion/exclusion reasoning
-- Progress tracking and checkpoint saving for large datasets
-
-**Workflow**:
-1. Extract text from PDF files using Adobe API
-2. Clean and segment extracted text
-3. Apply AI screening with structured prompts
-4. Generate screening decisions with detailed justifications
-
-### Machine Learning Filter (bacteremia_sr_machine_learning_filter_creation.ipynb)
-
-**Purpose**: Iterative machine learning-assisted title/abstract screening
-
-**Key Features**:
-- BibTeX database processing and entry management
-- TF-IDF vectorization for text preprocessing
-- LightGBM classifier with hyperparameter optimization using Optuna
-- High-recall optimization (F-beta score with β=4)
-- Iterative training on manually screened batches
-- PMID validation against known relevant studies
-
-**Workflow**:
-1. Process BibTeX databases and extract random samples
-2. Manual screening in Rayyan for training data
-3. Train LightGBM classifiers with optimized hyperparameters
-4. Apply filters to remaining literature
-5. Iterative refinement with additional manual screening rounds
-
-## Technical Requirements
-
-### R Dependencies
-
-```r
-# Meta-analysis packages
-library(metafor)
-library(metamisc)
-library(meta)
-
-# Data manipulation and visualization
-library(dplyr)
-library(ggplot2)
-library(gtsummary)
-
-# File I/O
-library(readxl)
-library(knitr)
 ```
 
-### Python Dependencies
-
-```python
-# PDF processing
-pdfservices-sdk
-
-# AI integration
-anthropic
-openai
-
-# Machine learning
-scikit-learn
-lightgbm
-optuna
-
-# Data processing
-pandas
-bibtexparser
-rispy
-
-# Text processing
-tqdm
-pydantic
-```
-
-## Getting Started
-
-### Meta-Analysis
-
-```r
-# Load your cleaned dataset
-cleaned_data <- readRDS("path/to/your/cleaned_data.rds")
-
-# Run meta-analysis for C-statistics
-create_forest_plot("qSOFA", meta_analysis_data)
-
-# Generate PROBAST visualizations
-rob_chart <- create_rob_chart(external_validation)
-```
-
-### AI-Assisted Screening
-
-```python
-# Configure AI client
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key="your_api_key"
-)
-
-# Process full-text screening
-result_df = process_fulltext_screening(
-    df=df_cleaned,
-    system_prompt=system_prompt,
-    client=client
-)
-```
-
-### Machine Learning Filtering
-
-```python
-# Train ML classifier
-model, vectorizer, threshold, params = train_final_model(
-    rayyan_decided_df,
-    beta_value=4,  # High recall optimization
-    n_trials=50
-)
-
-# Apply to new literature
-filtered_results = predict_and_summarize(
-    new_df, create_json_text, vectorizer, model, threshold
-)
-```
-
-## Key Outputs
-
-### Meta-Analysis Results
-
-- Forest Plots: Visual representation of pooled C-statistics and O:E ratios
-- Summary Tables: Comprehensive model performance metrics
-- Risk Assessment: PROBAST-based quality evaluation charts
-
-### Screening Results
-
-- AI Decisions: Structured inclusion/exclusion decisions with reasoning
-- ML Predictions: Probability scores for literature relevance
-- Performance Metrics: Sensitivity, specificity, and F-beta scores
-
-## Methodology Highlights
-
-### Statistical Approach
-
-- Random-effects meta-analysis using REML estimation
-- Prediction intervals for between-study heterogeneity
-- Subgroup analysis by model type and validation approach
-
-### AI Integration
-
-- Structured prompting for consistent screening decisions
-- Error handling with retry mechanisms and checkpoint saving
-- Validation against known relevant studies (PMID matching)
-
-### Machine Learning
-
-- Iterative training with expanding datasets
-- Hyperparameter optimization using Bayesian optimization
-- High-recall design to minimize false negatives in screening
-
-## Citation
-
-If you use this code in your research, please cite our systematic review:
+01\_ml\_filter/
+bacteremia\_sr\_machine\_learning\_filter\_creation.ipynb   # ML filter training & application
+02\_ai\_assist/
+bacteremia\_prediction\_sr\_preprocess\_for\_screening\_with\_ai.ipynb  # AI-assisted screening/extraction
+03\_meta\_analysis/
+meta\_analysis.R                                        # R analysis script (this repo)
+data/
+input/    # place input files here (see below)
+output/   # results will be written here
+README.md
 
 ```
-[Citation information will be added upon publication]
-```
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contributing
-
-We welcome contributions to improve the methodology and code quality. Please:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request with detailed description
-
-## Contact
-
-For questions about the methodology or code implementation, please contact:
-[Your contact information]
+You may prefix directories with numbers (`01_`, `02_`, `03_`) to control listing order on GitHub.
 
 ---
 
-**Note**: This repository represents a complete computational workflow for systematic reviews in medical AI. Each component can be adapted for other systematic review topics with appropriate modifications to search strategies and inclusion criteria.
+## Data Inputs
+
+- **Deduplicated RIS** exported from Mendeley after uploading RIS files from **multiple databases** and removing duplicates.
+- **Training labels**: 500 randomly sampled records (excluding the initial 50 trial records) screened by humans to create labeled data.
+- Recommended layout:
+```
+
+data/
+input/
+deduplicated\_references.ris
+labels\_training\_500.csv
+output/
+(created automatically by scripts)
+
+````
+
+> If raw data cannot be shared publicly, include a **toy dataset** in `data/input/` to demonstrate the pipeline end-to-end.
+
+---
+
+## Environment
+
+### Python (for 01_ml_filter and 02_ai_assist)
+- Python **3.12.5**
+- Packages: `scikit-learn 1.5.2`, `optuna 4.1.0`, `lightgbm 4.5.0`, `pandas`, `numpy`, `scipy`, `python-dotenv` (AI補助でAPIキーを扱う場合)
+
+Create and activate a virtual environment, then install:
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+
+pip install -r requirements.txt
+````
+
+*(If you don’t have `requirements.txt` yet, export one from your current environment and commit it.)*
+
+### R (for 03\_meta\_analysis)
+
+* R **4.3.x**
+* CRAN packages used by `meta_analysis.R`:
+
+  * `metafor`, `readxl`, `dplyr`, `ggplot2`, `tidyr`, `meta`, `forestplot`,
+    `metamisc`, `pROC`, `gridExtra`, `gtsummary`, `lubridate`, `purrr`, `forcats`, `knitr`, `kableExtra`
+
+Install (example):
+
+```r
+install.packages(c(
+  "metafor","readxl","dplyr","ggplot2","tidyr","meta","forestplot",
+  "metamisc","pROC","gridExtra","gtsummary","lubridate","purrr",
+  "forcats","knitr","kableExtra"
+))
+```
+
+---
+
+## Reproducible Workflow
+
+### 0) Pre-processing & Trial Screening (documentation)
+
+1. Export RIS from MEDLINE/CENTRAL/EMBASE (and others).
+2. Upload RIS files to **Mendeley** → **deduplicate** → export the **cleaned RIS**.
+3. Randomly sample **50** records for a **trial screening** (to refine criteria); **exclude** these from training.
+4. Randomly sample **500** records (excluding the initial 50) and perform human screening to create labels.
+
+Document these steps in `02_ai_assist/` notebook if you automate/pre-assist with AI.
+
+### 1) ML Filter (01\_ml\_filter)
+
+Notebook: `01_ml_filter/bacteremia_sr_machine_learning_filter_creation.ipynb`
+
+* Text features: **Title + Abstract → TF-IDF**
+* Classifier: **LightGBM**
+* Tuning: **Optuna**, recall-oriented (high sensitivity to minimize missed eligible studies)
+* Seed: set in notebook (e.g., `SEED=2025`)
+* Inputs:
+
+  * `data/input/deduplicated_references.ris`
+  * `data/input/labels_training_500.csv`
+* Outputs (example):
+
+  * `data/output/predictions.csv` (record\_id, score, rank)
+  * `data/output/model.pkl`
+
+> Run the notebook cell-by-cell. Before committing the notebook, consider **clearing all outputs** to keep diffs small.
+
+### 2) AI-assisted Full-text Screening / Data Extraction (02\_ai\_assist)
+
+Notebook: `02_ai_assist/bacteremia_prediction_sr_preprocess_for_screening_with_ai.ipynb`
+
+* Requires API key (e.g., `OPENAI_API_KEY`) in `.env` (do **not** commit secrets).
+* Typical steps:
+
+  * Pre-rank using `predictions.csv` (e.g., take top-K)
+  * Fetch/attach full texts (not included here)
+  * Apply standardized prompts/templates to assist screening/extraction
+* Outputs (example):
+
+  * `data/output/extracted_items.csv`
+  * Logs and prompt templates under `02_ai_assist/PROMPTS/` (if applicable)
+
+### 3) Meta-analysis (03\_meta\_analysis)
+
+Script: `03_meta_analysis/meta_analysis.R`
+
+* Set your input Excel path near the top:
+
+  ```r
+  file_path <- "your_file_path_here.xlsx"  # Replace with actual
+  ```
+
+* The script:
+
+  * Parses dates, coerces types, cleans categories/labels
+  * Splits rows for studies that reported **multiple model types**
+  * Builds summary tables (`gtsummary`) for **internal** and **external** validation subsets
+  * Performs **meta-analysis of C-statistics** (`valmeta(measure="cstat")`)
+  * Performs **meta-analysis of O\:E ratio** (`valmeta(measure="OE")`) using `oecalc`
+  * Produces **forest plots** (built-in `plot()` and customized `metamisc::forest`)
+  * Summarizes **PROBAST** Risk of Bias and Applicability
+  * Saves tables/figures to disk
+
+* Edit output paths in the script (replace placeholders like `your_output_path/` and `your/output/folder/path`) so results land under:
+
+  ```
+  data/output/
+    table1.docx
+    table1a.docx
+    table1b.docx
+    model_name_counts.docx
+    probast_rob_chart.png
+    probast_applicability_chart.png
+    probast_combined_chart.png
+    forest_plots/*.png
+    basic_summary_with_probast.csv
+  ```
+
+> The script prints summaries to console and uses `View()` for interactive inspection. When running headless (e.g., CI), you may comment out `View()` lines.
+
+---
+
+## Notes & Good Practices
+
+* **Reproducibility**: fix random seeds (Python notebooks) and document TF-IDF settings (ngram range, stopwords, max\_features).
+* **High-recall objective**: explicitly note thresholding strategy for screening (sensitivity vs. workload trade-off).
+* **Do not commit secrets**: keep API keys in `.env` and add `.env` to `.gitignore`.
+* **Large binary outputs**: avoid committing heavy artifacts (e.g., `.pkl`, `.docx`, `.png`) unless essential. Prefer writing to `data/output/` and ignoring via `.gitignore`.
+* **Clearing notebook outputs**: before committing, clear outputs (VS Code: *Command Palette → Notebook: Clear All Outputs*).
+
+Example `.gitignore`:
+
+```
+.venv/
+.env
+__pycache__/
+.ipynb_checkpoints/
+data/output/
+*.pkl
+*.docx
+*.png
+*.csv
+```
+
+---
+
+## How to Cite
+
+If you use this code, please cite the accompanying manuscript:
+
+> **Title**. Authors. Journal/Preprint, Year. DOI/URL (to be updated).
+
+---
+
+## License
+
+* **Code**: MIT (or your preference)
+* **Text/Figures**: CC BY 4.0 (adjust as needed)
+
+---
+
+## Contact
+
+* Maintainer: *Your Name* (your\@email)
+* Issues and questions: please open a **GitHub Issue** on this repository.
+
+```
+
+必要に応じて、フォルダ名（`01_ml_filter` など）や入出力ファイル名、Rスクリプト中の `file_path`／出力パスだけ差し替えてください。
+```
