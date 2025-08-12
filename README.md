@@ -13,17 +13,10 @@ This repository contains all code used in our systematic review of bacteremia pr
 01\_ml\_filter/
 bacteremia\_sr\_machine\_learning\_filter\_creation.ipynb   # ML filter training & application
 02\_ai\_assist/
-bacteremia\_prediction\_sr\_preprocess\_for\_screening\_with\_ai.ipynb  # AI-assisted screening/extraction
+bacteremia\_prediction\_sr\_preprocess\_for\_screening\_with\_ai.ipynb  # AI-assisted screening/data extraction
 03\_meta\_analysis/
-meta\_analysis.R                                        # R analysis script (this repo)
-data/
-input/    # place input files here (see below)
-output/   # results will be written here
+meta\_analysis.R                                        # R analysis script
 README.md
-
-```
-
-You may prefix directories with numbers (`01_`, `02_`, `03_`) to control listing order on GitHub.
 
 ---
 
