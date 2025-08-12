@@ -24,46 +24,19 @@ README.md
 
 - **Deduplicated RIS** exported from Mendeley after uploading RIS files from **multiple databases** and removing duplicates.
 - **Training labels**: 500 randomly sampled records (excluding the initial 50 trial records) screened by humans to create labeled data.
-- Recommended layout:
-
-
-data/
-input/
-deduplicated\_references.ris
-labels\_training\_500.csv
-output/
-(created automatically by scripts)
-
-````
-
-> If raw data cannot be shared publicly, include a **toy dataset** in `data/input/` to demonstrate the pipeline end-to-end.
-
----
 
 ## Environment
 
 ### Python (for 01_ml_filter and 02_ai_assist)
-- Python **3.12.5**
-- Packages: `scikit-learn 1.5.2`, `optuna 4.1.0`, `lightgbm 4.5.0`, `pandas`, `numpy`, `scipy`, `python-dotenv` (AI補助でAPIキーを扱う場合)
-
-Create and activate a virtual environment, then install:
-```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-
-pip install -r requirements.txt
-````
-
-*(If you don’t have `requirements.txt` yet, export one from your current environment and commit it.)*
+- Python **3.13.2**
+- Packages: `scikit-learn 1.5.2`, `optuna 4.1.0`, `lightgbm 4.5.0`, `pandas`, `numpy`, `scipy`, `python-dotenv`
 
 ### R (for 03\_meta\_analysis)
 
-* R **4.3.x**
+* R **4.4.2**
 * CRAN packages used by `meta_analysis.R`:
 
-  * `metafor`, `readxl`, `dplyr`, `ggplot2`, `tidyr`, `meta`, `forestplot`,
+  * `readxl`, `dplyr`, `ggplot2`, `tidyr`,
     `metamisc`, `pROC`, `gridExtra`, `gtsummary`, `lubridate`, `purrr`, `forcats`, `knitr`, `kableExtra`
 
 Install (example):
@@ -87,8 +60,6 @@ install.packages(c(
 3. Randomly sample **50** records for a **trial screening** (to refine criteria); **exclude** these from training.
 4. Randomly sample **500** records (excluding the initial 50) and perform human screening to create labels.
 
-Document these steps in `02_ai_assist/` notebook if you automate/pre-assist with AI.
-
 ### 1) ML Filter (01\_ml\_filter)
 
 Notebook: `01_ml_filter/bacteremia_sr_machine_learning_filter_creation.ipynb`
@@ -96,7 +67,6 @@ Notebook: `01_ml_filter/bacteremia_sr_machine_learning_filter_creation.ipynb`
 * Text features: **Title + Abstract → TF-IDF**
 * Classifier: **LightGBM**
 * Tuning: **Optuna**, recall-oriented (high sensitivity to minimize missed eligible studies)
-* Seed: set in notebook (e.g., `SEED=2025`)
 * Inputs:
 
   * `data/input/deduplicated_references.ris`
@@ -106,7 +76,7 @@ Notebook: `01_ml_filter/bacteremia_sr_machine_learning_filter_creation.ipynb`
   * `data/output/predictions.csv` (record\_id, score, rank)
   * `data/output/model.pkl`
 
-> Run the notebook cell-by-cell. Before committing the notebook, consider **clearing all outputs** to keep diffs small.
+> Run the notebook cell-by-cell. 
 
 ### 2) AI-assisted Full-text Screening / Data Extraction (02\_ai\_assist)
 
@@ -149,12 +119,8 @@ Script: `03_meta_analysis/meta_analysis.R`
   ```
   data/output/
     table1.docx
-    table1a.docx
-    table1b.docx
-    model_name_counts.docx
     probast_rob_chart.png
     probast_applicability_chart.png
-    probast_combined_chart.png
     forest_plots/*.png
     basic_summary_with_probast.csv
   ```
@@ -187,27 +153,7 @@ data/output/
 
 ---
 
-## How to Cite
-
-If you use this code, please cite the accompanying manuscript:
-
-> **Title**. Authors. Journal/Preprint, Year. DOI/URL (to be updated).
-
----
-
 ## License
 
 * **Code**: MIT (or your preference)
 * **Text/Figures**: CC BY 4.0 (adjust as needed)
-
----
-
-## Contact
-
-* Maintainer: *Your Name* (your\@email)
-* Issues and questions: please open a **GitHub Issue** on this repository.
-
-```
-
-必要に応じて、フォルダ名（`01_ml_filter` など）や入出力ファイル名、Rスクリプト中の `file_path`／出力パスだけ差し替えてください。
-```
