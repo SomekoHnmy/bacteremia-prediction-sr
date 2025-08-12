@@ -18,14 +18,14 @@ bacteremia\_prediction\_sr\_preprocess\_for\_screening\_with\_ai.ipynb  # AI-ass
 meta\_analysis.R                                        # R analysis script
 README.md
 
----
+```
 
 ## Data Inputs
 
 - **Deduplicated RIS** exported from Mendeley after uploading RIS files from **multiple databases** and removing duplicates.
 - **Training labels**: 500 randomly sampled records (excluding the initial 50 trial records) screened by humans to create labeled data.
 - Recommended layout:
-```
+
 
 data/
 input/
