@@ -155,5 +155,5 @@ data/output/
 
 ## License
 
-* **Code**: MIT (or your preference)
-* **Text/Figures**: CC BY 4.0 (adjust as needed)
+* **Code**: MIT 
+* **Text/Figures**: CC BY 4.0
