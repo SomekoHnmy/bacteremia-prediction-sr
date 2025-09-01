@@ -58,7 +58,7 @@ install.packages(c(
 1. Export RIS from MEDLINE/CENTRAL/EMBASE (and others).
 2. Upload RIS files to **Mendeley** → **deduplicate** → export the **cleaned RIS**.
 3. Randomly sample **50** records for a **trial screening** (to refine criteria); **exclude** these from training. Export these 50 records in any screening-friendly format (e.g., CSV); any format importable by common screening tools is acceptable.
-4. Randomly sample **500** records (excluding the initial 50) and perform human screening to create labels.
+4. Randomly sample **500** records (excluding the initial 50) and perform human screening to create labels. Export these 500 records in any screening-friendly format (e.g., CSV); any format importable by common screening tools is acceptable. Perform screening manually.
 
 ### 1) ML Filter (01\_ml\_filter)
 
